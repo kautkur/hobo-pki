@@ -1,0 +1,24 @@
+[req]
+default_bits        = 2048
+distinguished_name  = req_distinguished_name
+x509_extensions     = v3_req
+req_extensions      = v3_req
+extensions          = v3_req
+prompt              = no
+
+[req_distinguished_name]
+C = {{ ssl.country }}
+ST = {{ ssl.state }}
+L = {{ ssl.locality }}
+O = {{ ssl.organization }}
+OU = {{ ssl.organization_unit }}
+CN = {{ ssl.common_name }}
+
+[v3_req]
+keyUsage = keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+[alt_names]
+{% for san in sans %}
+DNS.{{ loop.index }} = {{ san }}
+{% endfor %}

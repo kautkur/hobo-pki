@@ -17,8 +17,10 @@ CN = {{ ssl.common_name }}
 [v3_req]
 keyUsage = keyEncipherment, dataEncipherment
 extendedKeyUsage = serverAuth
+{% if sans is defined %}
 subjectAltName = @alt_names
 [alt_names]
 {% for san in sans %}
 DNS.{{ loop.index }} = {{ san }}
 {% endfor %}
+{% endif %}

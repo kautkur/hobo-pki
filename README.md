@@ -34,3 +34,10 @@ You can create a directory in ./host_vars for the domain name, and add a `sans` 
     www.everywhere.com         : ok=9    changed=6    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
     www.nowhere.com            : ok=9    changed=6    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
     www.somewhere.com          : ok=9    changed=6    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 
+
+# Setting up pyenv and virtualenv
+
+    pyenv virtualenv 3.9.0 ansible-venv
+    pyenv activate ansible-venv
+    pip install ansible
+    

@@ -3,80 +3,8 @@
   gather_facts: no
   
   vars:
-    domain_name: "{{ inventory_hostname }}"
-    domain_workdir: "host_files/{{ domain_name }}"
-    openssl_config: "/tmp/openssl-{{ inventory_hostname }}.conf"
-
-    ssl:
-      country: CA
-      state: Ontario
-      locality: Warkworth
-      organization: Kautkur
-      organization_unit: Hicksville
-      common_name: "{{ domain_name }}"
-    # sans:
-    #   - www.mydomain.com
-    #   - www.mydomein.com
-    #   - www.anotheronetoo.com
-
+ 
   tasks:
 
-  - name: Template a file to /tmp/openssl.conf
-    delegate_to: localhost
-    template:
-      src: openssl.conf.j2
-      dest: "{{ openssl_config }}"
-      mode: '0644'
-
-  - name: Create a directory if it does not exist
-    delegate_to: localhost
-    file:
-      path: group_files/all
-      state: directory
-      mode: '0755'
-
-  - name: Check that the rootCA.key exists
-    delegate_to: localhost
-    stat:
-      path: group_files/all/rootCA.key
-    register: stat_result
-
-  - name: create private key
-    delegate_to: localhost
-    command: openssl genrsa -out group_files/all/rootCA.key 4096
-    when: not stat_result.stat.exists
-
-  - name: create self-signed CA
-    delegate_to: localhost
-    command: openssl req -x509 -new -nodes -key group_files/all/rootCA.key \
-      -config "{{ openssl_config }}" \
-      -sha256 -days 1024 -out group_files/all/rootCA.crt
-      
-  - name: Create a directory if it does not exist
-    delegate_to: localhost
-    file:
-      path: "{{ domain_workdir }}"
-      state: directory
-      mode: '0755'
-
-  - name: generate certificate key
-    delegate_to: localhost
-    command: "openssl genrsa -out {{ domain_workdir }}/{{ domain_name }}.key 2048"
-
-  - name: generate CSR
-    delegate_to: localhost
-    command: openssl req -new -sha256 \
-      -key "{{ domain_workdir }}/{{ domain_name }}.key" \
-      -config "{{ openssl_config }}" \
-      -out "{{ domain_workdir }}/{{ domain_name }}.csr"
-
-  - name: sign CSR
-    delegate_to: localhost
-    command: openssl x509 -req \
-      -extensions v3_req \
-      -extfile "{{ openssl_config }}" -days 120 \
-      -in "{{ domain_workdir }}/{{ domain_name }}.csr" \
-      -CA group_files/all/rootCA.crt \
-      -CAkey group_files/all/rootCA.key -CAcreateserial \
-      -out "{{ domain_workdir }}/{{ domain_name }}.crt" -sha256
-
+  roles:
+    - role-hobo-pki
